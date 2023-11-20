@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+Route::get('/home', function () {
     return view('welcome');
-});
+})->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::get('/auth/login', 'App\Http\Controllers\Auth\LoginController@loginForm')
@@ -28,13 +28,11 @@ Route::middleware('guest')->group(function () {
         ->name('auth.register');
 });
 
-Route::group(['prefix' => 'panel', 'middleware' => 'role:admin'], function () {
-    Route::get('users', 'App\Http\Controllers\UserController@index')->name('users.index');
-    Route::get('users/{id}/edit', 'App\Http\Controllers\UserController@edit')->name('users.edit');
-    Route::post('users/{id}/update', 'App\Http\Controllers\UserController@update')->name('users.update');
-    Route::get('roles', 'App\Http\Controllers\RoleController@index')->name('roles.index');
-    Route::post('roles', 'App\Http\Controllers\RoleController@store')->name('roles.store');
-    Route::get('roles/{id}/edit', 'App\Http\Controllers\RoleController@edit')->name('roles.edit');
-    Route::post('roles/{id}/update', 'App\Http\Controllers\RoleController@update')->name('roles.update');
-
-});
+Route::get('products', 'App\Http\Controllers\ProductsController@index')->name('products.index');
+Route::get('basket/add/{product}', 'App\Http\Controllers\BasketController@add')->name('basket.add');
+Route::get('basket', 'App\Http\Controllers\BasketController@index')->name('basket.index');
+Route::post('basket/update/{product}', 'App\Http\Controllers\BasketController@update')->name('basket.update');
+Route::get('basket/checkout', 'App\Http\Controllers\BasketController@checkoutForm')->name('basket.checkout.form');
+Route::post('basket/checkout', 'App\Http\Controllers\BasketController@checkout')->name('basket.checkout');
+Route::post('payment/{gateway}/callback', 'App\Http\Controllers\PaymentController@verify')->name('payment.verify');
+Route::post('coupon' , 'App\Http\Controllers\CouponsController@store')->name('coupons.store');
