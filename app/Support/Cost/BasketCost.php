@@ -17,13 +17,10 @@ class BasketCost implements CostInterface
         $this->basket = $basket;
     }
 
-
-
     public function getCost()
     {
         return $this->basket->subTotal();
     }
-
 
     public function getTotalCosts()
     {

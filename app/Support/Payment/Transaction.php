@@ -3,9 +3,8 @@
 namespace App\Support\Payment;
 
 use App\Events\OrderRegistered;
-use App\Invoice;
-use App\Order;
-use App\Payment;
+use App\Models\Order;
+use App\Models\Payment;
 use App\Support\Cost\Contracts\CostInterface;
 use Illuminate\Http\Request;
 use App\Support\Basket\Basket;
@@ -13,6 +12,7 @@ use App\Support\Payment\Gateways\GatewayInterface;
 use App\Support\Payment\Gateways\Pasargad;
 use App\Support\Payment\Gateways\Saman;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class Transaction
 {
@@ -26,28 +26,20 @@ class Transaction
     private $cost;
 
 
-    public function __construct(Request $request, Basket $basket , CostInterface $cost)
+    public function __construct(Request $request, Basket $basket, CostInterface $cost)
     {
         $this->request = $request;
         $this->basket = $basket;
         $this->cost = $cost;
     }
 
-
     public function checkout()
     {
         DB::beginTransaction();
 
         try {
-
             $order = $this->makeOrder();
-
-            $order->generateInvoice();
-
-
             $payment = $this->makePayment($order);
-
-
 
             DB::commit();
         } catch (\Exception $e) {
@@ -55,9 +47,7 @@ class Transaction
             return null;
         }
 
-        if ($payment->isOnline()) {
-            return $this->gatewayFactory()->pay($order , $this->cost->getTotalCosts());
-        }
+        if ($payment->isOnline()) return $this->gatewayFactory()->pay($order, $this->cost->getTotalCosts());
 
         $this->completeOrder($order);
 
@@ -66,12 +56,8 @@ class Transaction
 
     public function pay(Order $order)
     {
-
         return $this->gatewayFactory()->pay($order, $order->payment->amount);
-
     }
-
-
 
     public function verify()
     {
@@ -86,11 +72,8 @@ class Transaction
         return true;
     }
 
-
-
     private function completeOrder($order)
     {
-
         $this->normalizeQuantity($order);
 
         event(new OrderRegistered($order));
@@ -100,10 +83,6 @@ class Transaction
         session()->forget('coupon');
     }
 
-
-
-
-
     private function normalizeQuantity($order)
     {
         foreach ($order->products as $product) {
@@ -111,20 +90,13 @@ class Transaction
         }
     }
 
-
-
-
     private function confirmPayment($result)
     {
         return $result['order']->payment->confirm($result['refNum'], $result['gateway']);
     }
 
-
-
-
     private function gatewayFactory()
     {
-
         if (!$this->request->has('gateway')) return resolve(Saman::class);
 
         $gateway = [
@@ -132,15 +104,13 @@ class Transaction
             'pasargad' => Pasargad::class
         ][$this->request->gateway];
         return resolve($gateway);
-
-
     }
 
     private function makeOrder()
     {
         $order = Order::create([
             'user_id' => auth()->user()->id,
-            'code' => bin2hex(str_random(16)),
+            'code' => bin2hex(Str::random(16)),
             'amount' => $this->basket->subTotal()
         ]);
 
@@ -148,7 +118,6 @@ class Transaction
 
         return $order;
     }
-
 
     private function makePayment($order)
     {
@@ -159,18 +128,11 @@ class Transaction
         ]);
     }
 
-
-    private function products()
+    private function products(): array
     {
         foreach ($this->basket->all() as $product) {
             $products[$product->id] = ['quantity' => $product->quantity];
         }
-
         return $products;
     }
-
-
-
-
-
 }

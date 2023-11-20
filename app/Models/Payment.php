@@ -1,27 +1,24 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-    protected $fillable = [
-        'order_id', 'amount', 'status', 'method', 'gateway', 'ref_num'
-    ];
+    use HasFactory;
 
+    protected $fillable = ['order_id', 'amount', 'status', 'methode', 'gateway', 'ref_num'];
 
     protected $attributes = [
-        'status' => 0
+        'status' => 0,
     ];
 
-
-
-    public function isOnline()
+    public function isOnline(): bool
     {
         return $this->method === 'online';
     }
-
 
     public function confirm(string $refNum, string $gateway = null)
     {
@@ -30,5 +27,4 @@ class Payment extends Model
         $this->status = 1;
         $this->save();
     }
-
 }

@@ -5,6 +5,7 @@ namespace App\Support\Storage;
 use App\Support\Storage\Contracts\StorageInterface;
 use Countable;
 
+
 class SessionStorage implements StorageInterface, Countable
 {
     private $bucket;
@@ -14,6 +15,10 @@ class SessionStorage implements StorageInterface, Countable
         $this->bucket = $bucket;
     }
 
+    /**
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
     public function get($index)
     {
         return session()->get($this->bucket . '.' . $index);
@@ -21,30 +26,38 @@ class SessionStorage implements StorageInterface, Countable
 
     public function set($index, $value)
     {
-        return session()->put($this->bucket . '.' . $index, $value);
+        session()->put($this->bucket . '.' . $index, $value);
     }
 
+    /**
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
     public function all()
     {
         return session()->get($this->bucket) ?? [];
     }
 
-    public function exists($index)
+    public function exists($index): bool
     {
         return session()->has($this->bucket . '.' . $index);
     }
 
     public function unset($index)
     {
-        return session()->forget($this->bucket . '.' . $index);
+        session()->forget($this->bucket . '.' . $index);
     }
 
     public function clear()
     {
-        return session()->forget($this->bucket);
+        session()->forget($this->bucket);
     }
 
-    public function count()
+    /**
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    public function count(): int
     {
         return count($this->all());
     }

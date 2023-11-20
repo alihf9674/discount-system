@@ -1,60 +1,28 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class Order extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['user_id', 'code', 'amount'];
 
-
-    public function products()
+    public function products(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Product::class)->withPivot('quantity');
     }
 
-
-    public function payment()
+    public function payment(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Payment::class);
     }
 
-
-
-    public function user()
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
     }
-
-    public function generateInvoice()
-    {
-        $pdf = \PDF::loadView('order.invoice', ['order' => $this]);
-
-        return $pdf->save($this->invoicePath());
-    }
-
-    public function paid()
-    {
-        return $this->payment->status;
-    }
-
-
-    public function downloadInvoice()
-    {
-
-        return Storage::disk('public')->download('invoices/' . $this->id . '.pdf');
-
-    }
-
-    public function invoicePath()
-    {
-        return storage_path('app/public/invoices/') . $this->id . '.pdf';
-    }
-
-
-
-
-
 }
