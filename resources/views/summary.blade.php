@@ -6,10 +6,10 @@
         <div class="well">
             <table class='table'>
 
-                    <tr>
-                        <td>{{$description}}</td>
-                        <td>  @lang('payment.toman')</td>
-                    </tr>
+                <tr>
+                    <td>{{$description}}</td>
+                    <td>  @lang('payment.toman')</td>
+                </tr>
 
                 <tr>
                     <td>@lang('payment.basket total')</td>
@@ -22,22 +22,24 @@
                         </td>
                         <td>
                             @if(session()->has('coupon'))
-                                <form action="" method="get">
+                                <form action="{{route('coupons.remove')}}" method="get">
                                     @csrf
                                     <div class="input-group">
-                                        <span >{{session()->get('coupon')->code}}</span>
+                                        <span>{{session()->get('coupon')->code}}</span>
                                         <span class="input-group-btn">
-                                    <button class="btn btn-primary btn-sm  ml-3" type="submit">@lang('payment.remove')</button>
+                                    <button class="btn btn-primary btn-sm  ml-3"
+                                            type="submit">@lang('payment.remove')</button>
                                 </span>
                                     </div>
                                 </form>
                             @else
-                                <form action="{{route('coupons.store')}}"  method="post">
+                                <form action="{{route('coupons.store')}}" method="post">
                                     @csrf
                                     <div class="input-group">
                                         <input id='coupon' name='coupon' type="text" class="form-control">
                                         <span class="input-group-btn">
-                                    <button id='coupon-apply' class="btn btn-primary  ml-3" type="submit">@lang('payment.apply')</button>
+                                    <button id='coupon-apply' class="btn btn-primary  ml-3"
+                                            type="submit">@lang('payment.apply')</button>
                                 </span>
                                     </div>
                                 </form>

@@ -36,3 +36,4 @@ Route::get('basket/checkout', 'App\Http\Controllers\BasketController@checkoutFor
 Route::post('basket/checkout', 'App\Http\Controllers\BasketController@checkout')->name('basket.checkout');
 Route::post('payment/{gateway}/callback', 'App\Http\Controllers\PaymentController@verify')->name('payment.verify');
 Route::post('coupon' , 'App\Http\Controllers\CouponsController@store')->name('coupons.store');
+Route::post('coupon/remove' , 'App\Http\Controllers\CouponsController@remove')->name('coupons.remove');
