@@ -3,15 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Coupon;
+use App\Support\Discount\Coupon\CouponValidator;
 use Exception;
 use Illuminate\Http\Request;
 
 class CouponController extends Controller
 {
 
-    public function __construct()
+    /**
+     * @var CouponValidator
+     */
+    private $validator;
+
+    public function __construct(CouponValidator $validator)
     {
         $this->middleware('auth');
+        $this->validator = $validator;
     }
 
     public function store(Request $request)
@@ -23,6 +30,8 @@ class CouponController extends Controller
 
             $coupon = Coupon::where('code', $request->coupon)->firstOrFail();
 
+            $this->validator->isValid($coupon);
+
             session()->put(['coupon' => $coupon]);
 
             return redirect()->back()->withSuccess('کد تخفیف با موفقیت اعمال شد');
@@ -30,7 +39,6 @@ class CouponController extends Controller
         } catch (Exception $e) {
             return redirect()->back()->withError('کد تخفیف نامعتبر میباشد.');
         }
-
     }
 
     public function remove()
