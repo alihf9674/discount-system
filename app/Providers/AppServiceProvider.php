@@ -5,6 +5,9 @@ namespace App\Providers;
 use App\Support\Basket\Basket;
 use App\Support\Cost\BasketCost;
 use App\Support\Cost\Contracts\CostInterface;
+use App\Support\Cost\DiscountCost;
+use App\Support\Cost\ShippingCost;
+use App\Support\Discount\DiscountManager;
 use App\Support\Storage\Contracts\StorageInterface;
 use App\Support\Storage\SessionStorage;
 use Illuminate\Support\Facades\Schema;
@@ -36,7 +39,9 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(CostInterface::class, function ($app) {
-            return new BasketCost($app->make(Basket::class));
+            $basketCost = new BasketCost($app->make(Basket::class));
+            $shippinCost = new ShippingCost($basketCost);
+            return new DiscountCost($shippinCost , $app->make(DiscountManager::class));
         });
     }
 }

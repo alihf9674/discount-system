@@ -41,7 +41,7 @@ class CouponController extends Controller
         }
     }
 
-    public function remove()
+    public function remove(): \Illuminate\Http\RedirectResponse
     {
         session()->forget('coupon');
         return back();
