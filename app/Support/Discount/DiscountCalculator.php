@@ -13,6 +13,11 @@ class DiscountCalculator
         return $this->isExceeded($discountAmount, $coupon->limit) ? $coupon->limit : $discountAmount;
     }
 
+    public function discountedPrice(Coupon $coupon, int $amount)
+    {
+        return $amount - $this->discountAmount($coupon, $amount);
+    }
+
     private function isExceeded(int $amount, int $limit): bool
     {
         return $amount > $limit;
